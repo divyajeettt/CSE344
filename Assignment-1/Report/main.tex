@@ -1,0 +1,190 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+
+\title{
+    \textbf{CSE344: Computer Vision} \\ \vspace*{-5pt}
+    \textbf{\large{Assignment-1}}
+}
+
+\author{\href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}}
+\date{\today}
+
+\geometry{a4paper, left=20mm, right=20mm, top=20mm, bottom=20mm}
+
+
+\begin{document}
+    \maketitle
+
+    \section*{\textbf{Theory}}
+
+    \subsection*{\textbf{Question 1.}}
+    \begin{enumerate}[label=(\alph*)]
+        \item The given problem of classifying papaya images into the classes `sweet'
+        and `not sweet' is a binary classification problem. The Mean Squared Error function
+        is non-convex for binary classifcation. Thus if a binary classifier is
+        trained with MSE Loss, it is not guaranteed to converege to the minimum of the loss.
+        Secondly, using MSE assumes an underlying Gaussian distribution\footnote{
+        In fact, mean squared error is the KL divergence between the empirical distribution of
+        the data and a Gaussian model.},
+        which is not valid in case of binary classification, since it is modeled with a
+        Bernoulli distribution.
+
+        \item For a single training example, the Binary Cross Entropy loss function
+        is given by (assuming $\hat{y}$ is a valid probability in $[0, 1]$)
+        \begin{equation*}
+            \mathcal{L}(\hat{y}) = - y \log_{2}{(\hat{y})} - (1 - y) \log_{2}{(1 - \hat{y})}
+        \end{equation*}
+
+        \item On a negative example (where $y = 0$), if the predicted value is $\hat{y} = 0.9$,
+        the value of loss is given by
+        \begin{equation*}
+            \mathcal{L}(0.9) = - 0 \log_{2}{(0.9)} - (1 - 0) \log_{2}{(1 - 0.9)}
+            = - \log_{2}{(0.1)} \approx 3.322
+        \end{equation*}
+
+        \item Now, we calculate the mean loss for 3 examples for the given ground truth
+        and predicted values
+        \begin{align*}
+            \mathcal{L}(\hat{Y}) &= - \frac{1}{3} \sum_{i=1}^{3} y_{i} \log_{2}{\hat{y_{i}}} +
+            (1 - y_{i}) \log_{2}{(1 - \hat{y_{i}})} \\
+            &= - \frac{1}{3} \big{(} \log_{2}{(0.1)} + \log_{2}{(0.8)} + \log_{2}{(0.3)} \big{)} \\
+            &\approx \frac{1}{3} \big{(} 3.222 + 3.222 + 1.737 \big{)} = \frac{8.181}{3} = 2.727
+        \end{align*}
+
+        \item For a learning rate $\alpha$ and a traininable weight $W$, the update formula
+        while using $L_{2}$-regularization (hyperparameter $\lambda$) is given by
+        \begin{equation*}
+            W_{\mathbf{new}} \gets W_{\mathbf{old}} - \alpha \left( \frac{\partial{L_{BCE}}}{\partial{W}}
+            + 2 \lambda W_{\mathbf{old}} \right)
+        \end{equation*}
+        The $L_{2}$-regularization applied in model $A$ penalizes very large weights by adding some
+        proportion of the weights themselves to the gradient update. Hence, we expect model $A$'s weights
+        to be relatively smaller than model $B$'s final trained weights. However, this technique (usually)
+        reduces overfitting, as model $A$ will be encouraged to learn simpler patterns than model $B$.
+
+        \item KL-divergence is a measure of `\textit{distance}' or difference between two probability distributions.
+        KL-divergence measures the relative entropy of two distributions. On the other hand, cross entropy can
+        be thought of as the total entropy between them. The formula for KL-divergence and cross-entropy are as follows
+        \begin{align*}
+            D_{\text{KL}}(P || Q) = \mathbb{E}_{X \sim P}\left[ \log\frac{P(X)}{Q(X)} \right]
+            &= \mathbb{E}_{X \sim P}[\log P(X) - \log Q(X)]\\
+            H(P, Q) &= - \mathbb{E}_{X \sim P}[\log Q(X)]
+        \end{align*}
+        These quantities are closely related - minimizing the cross-entropy $H(P, Q)$ with respect to $Q$
+        is equivalent to minimize the KL-divergence $D_{\text{KL}}(P || Q)$. Their relationship is given in
+        the following equations
+        \begin{align*}
+            D_{\text{KL}}(P || Q) &= \mathbb{E}_{X \sim P}[\log P(X)] - \mathbb{E}_{X \sim P}[\log Q(X)] \\
+            &= H(P, Q) + \mathbb{E}_{X \sim P}[\log P(X)] \\
+            &= H(P, Q) - H(P) \\
+            \implies H(P, Q) &= H(P) + D_{\text{KL}}(P || Q)
+        \end{align*}
+        where Shannon entropy of a distribution $P$ is defined as in class,
+        \begin{equation*}
+            H(P) = - \mathbb{E}_{X \sim P}[\log P(X)]
+        \end{equation*}
+    \end{enumerate}
+
+    \subsection*{\textbf{Question 2.}}
+    We are given the following information about the 2-layer neural network for
+    $K$-class classification problem.
+    \begin{align*}
+        z^{[i]} &= W^{[i]} a^{[i-1]} + b^{[i]}, \quad i = 1, 2 \quad a^{[0]} = x \\
+        a^{[1]} &= \textsc{LeakyReLU}\left( z^{[1]}, \alpha=10^{-2} \right) \\
+        \hat{y} &= \textsc{Softmax}\left( z^{[2]} \right) = \sigma\left( z^{[2]} \right) \quad \text{(say)} \\
+        \mathcal{L}(\hat{y}) &= - \sum_{i=1}^{K} y_{i} \log{(\hat{y_{i}})}
+    \end{align*}
+    \begin{enumerate}[label=(\alph*)]
+        \item Let us assume $z^{[2]}$ is of size $K \times 1$ (since it is a $K$-class
+        classification problem). Since $z^{[1]}$ is of size $D_{a} \times 1$, $a^{[1]}$
+        must be of the same size, and hence, the $W^{[2]}$ must of be size $K \times D_{a}$.
+        Following this, $b^{[2]}$ must be of size $K \times 1$.
+        \begin{align*}
+            z^{[2]}_{(K \times 1)} &= W^{[2]}_{(K \times D_{a})} a^{[1]}_{(D_{a} \times 1)} + b^{[2]}_{(K \times 1)}
+        \end{align*}
+
+        \item Let us denote the sum of exponentials (normalizing term) of the entries in $z^{[2]}$ by
+        \begin{align*}
+            \mathbf{z} &= \sum_{j=1}^{K} \exp{z^{[2]}_{j}} \text{, which means } \hat{y} = \sigma\left( z^{[2]} \right) = \frac{\exp{z^{[2]}}}{\mathbf{z}}
+        \end{align*}
+        We are required to find the partial derivative of the $k^{th}$ entry in $\hat{y}$ with respect
+        to the $k^{th}$ entry in $z^{[2]}$.
+        \begin{align*}
+            \frac{\partial{\hat{y}_{k}}}{\partial{z^{[2]}_{k}}} &= \frac{\partial}{\partial{z^{[2]}_{k}}} \left( \sigma\left( z^{[2]}_{k} \right) \right)
+            = \frac{\partial}{\partial{z^{[2]}_{k}}} \left( \frac{\exp{z^{[2]}_{k}}}{\mathbf{z}} \right) \\
+            &= \frac{1}{\mathbf{z}^{2}} \left( \mathbf{z} \ \frac{\partial}{\partial{z^{[2]}_{k}}} \left( \exp{z^{[2]}_{k}} \right) -
+            \exp{z^{[2]}_{k}} \ \frac{\partial}{\partial{z^{[2]}_{k}}} \left( \mathbf{z} \right) \right) \\
+            &= \frac{1}{\mathbf{z}^{2}} \left( \mathbf{z} \ \exp{z^{[2]}_{k}} \ - \ \left( \exp{z^{[2]}_{k}} \right)^{2} \right)
+            = \frac{\exp{z^{[2]}_{k}}}{\mathbf{z}} - \left( \frac{\exp{z^{[2]}_{k}}}{\mathbf{z}} \right)^{2} \\
+            &= \hat{y}_{k} - \hat{y}_{k}^{2} = \hat{y}_{k} \left( 1 - \hat{y}_{k} \right)
+        \end{align*}
+
+        \item Next, we find the partial derivative of the $k^{th}$ entry in $\hat{y}$ with respect
+        to the $i^{th}$ entry in $z^{[2]}$, given $i \neq k$.
+        \begin{align*}
+            \frac{\partial{\hat{y}_{k}}}{\partial{z^{[2]}_{i}}} &= \frac{\partial}{\partial{z^{[2]}_{i}}} \left( \sigma\left( z^{[2]}_{k} \right) \right)
+            = \frac{\partial}{\partial{z^{[2]}_{i}}} \left( \frac{\exp{z^{[2]}_{k}}}{\mathbf{z}} \right) \\
+            &= \frac{1}{\mathbf{z}^{2}} \left( \mathbf{z} \ \frac{\partial}{\partial{z^{[2]}_{i}}} \left( \exp{z^{[2]}_{k}} \right) -
+            \exp{z^{[2]}_{k}} \ \frac{\partial}{\partial{z^{[2]}_{i}}} \left( \mathbf{z} \right) \right) \\
+            &= \frac{1}{\mathbf{z}^{2}} \left( 0 - \exp{z^{[2]}_{k}} \exp{z^{[2]}_{i}} \right)
+            = - \frac{\exp{z^{[2]}_{k}}}{\mathbf{z}} \cdot \frac{\exp{z^{[2]}_{i}}}{\mathbf{z}} \\
+            &= - \hat{y}_{k} \hat{y}_{i}
+        \end{align*}
+
+        \item We are interested in the partial derivative of the loss with respect to entries in $z^{[2]}$. Using
+        the chain rule, we have
+        \begin{equation*}
+            \frac{\partial{\mathcal{L}}}{\partial{z^{[2]}_{i}}} =
+            \frac{\partial{\mathcal{L}}}{\partial{\hat{y}_{i}}} \frac{\partial{\hat{y}_{i}}}{\partial{z^{[2]}_{i}}}
+        \end{equation*}
+        With the above (given) loss function, we can find
+        \begin{equation*}
+            \frac{\partial{\mathcal{L}}}{\partial{\hat{y}_{i}}}
+            = \frac{\partial}{\partial{\hat{y}_{i}}} \left( -\sum_{j=1}^{K} y_{j} \log{(\hat{y}_{j})} \right)
+            = -\sum_{j=1}^{K} y_{j} \frac{\partial}{\partial{\hat{y}_{i}}} (\log{(\hat{y}_{j})})
+            = - \frac{y_{i}}{\hat{y}_{i}}
+        \end{equation*}
+        Note that as a result from \textbf{Question 2.} (b),
+        \begin{equation*}
+            \frac{\partial{\hat{y}_{i}}}{\partial{z^{[2]}_{i}}} = \hat{y}_{i} (1 - \hat{y}_{i})
+        \end{equation*}
+        So, we have
+        \begin{equation*}
+            \frac{\partial{\mathcal{L}}}{\partial{z^{[2]}_{i}}} = - \frac{y_{i}}{\hat{y}_{i}} \cdot \hat{y}_{i} (1 - \hat{y}_{i})
+            = - y_{i} (1 - \hat{y}_{i})
+        \end{equation*}
+        Now, we are given that $y_{k} = 1$ and $y_{i} = 0, i \neq k$. So, we get (where $\mathbb{I}$ is an indicator variable)
+        \begin{equation*}
+            \frac{\partial{\mathcal{L}}}{\partial{z^{[2]}_{i}}} = \mathbb{I}_{\{i = k\}} (\hat{y_{i}} - 1) = \begin{cases}
+                \hat{y}_{k} - 1 & \text{if } i = k \\
+                0 & \text{if } i \neq k
+            \end{cases}
+        \end{equation*}
+
+        \item While implementing the softmax function, we run into the problem of numerical overflow
+        and underflow. Overflow occurs while exponentiating large numbers, when the result exceeds the
+        computer's largest representable float value. In such cases, the result of $e^{z}$ is estimated to be
+        infinity (\texttt{torch.inf} in PyTorch). Conversely, underflow occurs while exponentiating small
+        numbers, when extremely small values are represented by zeros. Rarely, it is also possible
+        that the denominator is extremely small, which makes division unstable. \\
+        A common modification to resolve the issue is normalizing the input by max-shifting. In this
+        technique, we subtract the maximum of the vector from all its entries, making all of them
+        non-positive, and at least one entry 0. The output probabilities do not change because the relative
+        difference between the entries in $z$ does not change, but the numberical
+        operations become more stable. So, for a vector $z$ of size $m$, we get
+        \begin{align*}
+            z^{*} &= z - \max_{k = 1, 2, \dots, m}{z_{k}} \\
+            \sigma(z) &= \sigma(z^{*}) = \frac{\exp{z^{*}}}{\sum_{j=1}^{m} \exp{z_{j}^{*}}}
+        \end{align*}
+    \end{enumerate}
+
+\end{document}
