@@ -212,68 +212,110 @@
         with batch size 256.
         \item To visualize the data distribution across class labels, we count the number
         of images in the entire dataset. Then, I compared the proportion of images in each
-        class in the training and validation set. The plots are given in the following figures.
+        class in the training and validation set. `Proportion' refers to the fraction of
+        images of the entire dataset belonging to each class. The plots are given in the
+        Figure (\ref{fig:classification-data-distro}) (Blue represents the training set and
+        Orange represents the validation set).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.7\textwidth]{Assets/Classification/01}
+            \includegraphics[width=0.7\textwidth]{Assets/Classification/02}
+            \caption{Class distribution in the entire dataset, training set, and validation set}
+            \label{fig:classification-data-distro}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 2.}}
     \begin{enumerate}[label=(\alph*)]
-        \item The given CNN architecture was constructed in the class
-        \texttt{ConvNet}. The model constructed using PyTorch.
-        \item I used wandb to log the training and validation losses and accuracies
-        per epoch. The plots are given in the figures below.
+        \item The given CNN architecture was constructed in the class \texttt{ConvNet} using PyTorch
+        and was trained for a total of 15 epochs.
+        \item The per epoch loss/accuracy curves generated using wandb are given in Figure
+        (\ref{fig:convnet-loss-accuracy-curves}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Convnet/01}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Convnet/02}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Convnet/03}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Convnet/04}
+            \caption{Loss and Accuracy curves (per epoch) for the given CNN architecture}
+            \label{fig:convnet-loss-accuracy-curves}
+        \end{figure}
         \item Looking at the figures, it is clear that the model is overfitting after
         training for a few epochs, since the validation loss stops decreasing sharply
-        while the training loss keeps decreasing. The final training accuracy after 15
-        epochs is close to 0.86+, while the validation accuracy was around 0.58+ only.
-        \item The confusion matrix, logged using wandb, is given in the following figure.
-        However, it is still surprisig that the accuracy on the test set was 0.91+. This
+        while the training loss keeps decreasing. There is a large gap between the training
+        and validation losses, and the same goes for accuracies. The final training accuracy
+        after 15 epochs is close to 0.86+, while the validation accuracy was around 0.58+ only.
+        \item The confusion matrix (logged using wandb) is given in Figure (\ref{fig:convnet-conf-matrix}).
+        However, it is still surprisig that the accuracy on the test set was 0.917+. This
         is a good example of why accuracy is not the only indicator of a model's performance.
-        \begin{table}[h!]
+        The precision, recall, and F1-score for the classification all turned out to be 0.588+.
+        \begin{figure}[h!]
             \centering
-            \begin{tabular}{l|c}
-                \textsc{Metric} & \textsc{Value} \\
-                \hline
-                Accuracy & 0.91773+ \\
-                Precision & 0.58870+ \\
-                Recall & 0.58870+ \\
-                F1-Score & 0.58870+
-            \end{tabular}
-            \caption{Evaluation Metrics for the given CNN architecture}
-        \end{table}
-        \item Finally, we visualize 3 misclassified images from each class. These
-        are also given in the same notebook. A few examples are also given in the
-        following figure. There were quite a few examples where the ground truth
-        class was not present or did not cover a majority of the image. For example,
-        some images of class \texttt{amur\_leopard} were not clear. In some cases,
-        the ground truth class was also not present, for example, in case of
-        \texttt{black\_bear}. There was also a case where the image looks like the
-        predicted class - \texttt{brown\_bear} being predicted as \texttt{black\_bear}
-        and \texttt{wild\_bear}.
+            \includegraphics[width=0.7\textwidth]{Assets/Classification/Convnet/05}
+            \caption{Confusion Matrix for the given CNN architecture}
+            \label{fig:convnet-conf-matrix}
+        \end{figure}
+        \item Finally, we visualize 3 misclassified images from each class. These are also
+        given in the same notebook. A few examples are also given in Figure
+        (\ref{fig:convnet-misclassifications}). There were quite a few examples where the
+        ground truth class was not present or did not cover a majority of the image. For
+        example, some images of class \texttt{amur\_leopard} were not clear. In some cases,
+        the ground truth class was also not present, for example, in case of \texttt{black\_bear}.
+        There was also a case where the image looks like the predicted class - \texttt{brown\_bear}
+        being predicted as \texttt{black\_bear} and \texttt{wild\_bear}.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/01}
+            \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/02}
+            \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/03}
+            \caption{Classwise examples of misclassified images}
+            \label{fig:convnet-misclassifications}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 3.}}
     \begin{enumerate}[label=(\alph*)]
-        \item Next, we finetune the Resnet-18 model availble in PyTorch on the
-        Russian Wildlife dataset and again log the accuracies and losses using wandb.
+        \item Next, we finetune the Resnet-18 model availble in PyTorch on the Russian Wildlife
+        dataset. The model was finetuned for a total of 10 epochs due to computational limitations.
+        The per epoch loss/accuracy curves generated using wandb are given in Figure
+        (\ref{fig:resnet-loss-accuracy-curves}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet/01}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet/02}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet/03}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet/04}
+            \caption{Loss and Accuracy curves (per epoch) for Resnet-18}
+            \label{fig:resnet-loss-accuracy-curves}
+        \end{figure}
         \item This model is not overfitting as much as the previous model. This is
         inferred because the difference between the training loss and validation loss
         is lower, and the same goes for the accuracy.
-        \item The evaluation metrics for the Resnet-18 architecture are given in the table below.
-        \begin{table}[h!]
+        \item The Resnet-18 mmodel performed better than the previous model. It achieved
+        an accuracy of 0.969+. The precision, recall, and F1-score for the classification
+        all turned out to be 0.846+. The confusion matrix (logged using wandb) is given in
+        Figure (\ref{fig:resnet-conf-matrix}).
+        \begin{figure}[h!]
             \centering
-            \begin{tabular}{l|c}
-                \textsc{Metric} & \textsc{Value} \\
-                \hline
-                Accuracy & 0.96937+ \\
-                Precision & 0.84688+ \\
-                Recall & 0.84688+ \\
-                F1-Score & 0.84688+
-            \end{tabular}
-            \caption{Evaluation Metrics for the Resnet-18 architecture}
-        \end{table}
-        \item The 2D and 3D representations of the feature space generated by
-        input samples from training and validation sets by the classifier were generated
-        and are given in the following figures.
+            \includegraphics[width=0.7\textwidth]{Assets/Classification/Resnet/05}
+            \caption{Confusion Matrix for the Resnet-18 architecture}
+            \label{fig:resnet-conf-matrix}
+        \end{figure}
+        \item The 2D and 3D representations of the feature space generated by input samples
+        from training and validation sets by the classifier were generated and are given in
+        Figure (\ref{fig:resnet-tsne-2d}) and Figure (\ref{fig:resnet-tsne-3d}) respectively.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.9\textwidth]{Assets/Classification/Resnet/06}
+            \caption{2D $t$-SNE visualizations of the training and validation set}
+            \label{fig:resnet-tsne-2d}
+        \end{figure}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.5\textwidth]{Assets/Classification/Resnet/07}
+            \caption{3D $t$-SNE visualizations of the validation set}
+            \label{fig:resnet-tsne-3d}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 4.}}
@@ -282,26 +324,32 @@
         transforms to add randomness in the data, which are available in \texttt{torchvision.transforms}.
         Specifically, I applied random affine transforms, random horizontal flipping with probability
         0.5 for each image, and added random color noise or jitter in the images, altering their
-        color schemes (brightness, contrast, saturation, and hue). A total of 2000
-        augmented images were added to the dataset.
+        color schemes (brightness, contrast, saturation, and hue). A total of 2000 augmented images were
+        added to the dataset.
         \item As asked in the Question, the same steps as \textbf{Question 2.3 (a)} were
         followed to train the Resnet-18 model on the augmented dataset.
         \item Looking at the loss curves, it is clear that this model performs even better
-        than before, and is not overfitting. The curves are given in the following figures.
-        \item The evaluation metrics for the model trained on the augmented dataset are given
-        in the following table.
-        \begin{table}[h!]
+        than before, and is not overfitting. The per epoch loss/accuracy curves generated using wandb
+        are given in Figure (\ref{fig:resnet-aug-loss-accuracy-curves}).
+        \begin{figure}[h!]
             \centering
-            \begin{tabular}{l|c}
-                \textsc{Metric} & \textsc{Value} \\
-                \hline
-                Accuracy & 0.97653+ \\
-                Precision & 0.88265+ \\
-                Recall & 0.0.88265+ \\
-                F1-Score & 0.88265+
-            \end{tabular}
-            \caption{Evaluation Metrics for the Resnet-18 architecture on augmented dataset}
-        \end{table}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet-Aug/01}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet-Aug/02}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet-Aug/03}
+            \includegraphics[width=0.4\textwidth]{Assets/Classification/Resnet-Aug/04}
+            \caption{Loss and Accuracy curves (per epoch) for Resnet-18 architecture (on augmented dataset)}
+            \label{fig:resnet-aug-loss-accuracy-curves}
+        \end{figure}
+        \item The Resnet-18 mmodel finetuned on the augmented dataset performed marginally better than
+        the previous model. It achieved an accuracy of 0.976+. The precision, recall, and F1-score for
+        the classification all turned out to be 0.883+. The confusion matrix (logged using wandb) is given
+        in Figure (\ref{fig:resnet-aug-conf-matrix}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.7\textwidth]{Assets/Classification/Resnet-Aug/05}
+            \caption{Confusion Matrix for the Resnet-18 architecture (on augmented dataset)}
+            \label{fig:resnet-aug-conf-matrix}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 5.}}
@@ -310,7 +358,15 @@
     from the mean of both the ground truth and predicted classes. It is interesting to note
     that in some cases, the distance to the mean of the ground truth class was lower than
     the distance to the mean of the predicted class. However, such cases were rare.
-    A few examples are given in the following figures.
+    A few examples are given in Figure (\ref{fig:dists}).
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/04}
+        \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/05}
+        \includegraphics[width=0.325\textwidth]{Assets/Classification/Convnet/Misclassifications/06}
+        \caption{Euclidean distances of misclassified images to centroids of predicted and true classes}
+        \label{fig:dists}
+    \end{figure}
 
     \subsection*{\textbf{Question 6.}}
     On comparing all the three models, it is pretty clear that the vanilla CNN architecture
@@ -332,16 +388,32 @@
         \item Similar to the image classification problem, I created a custom dataset
         class, \texttt{IDD}, which also handles label mappings and mask color mappings for
         both the IDD and Cityscapes dataset. Since the images were larger in size, I used
-        a batch size of 8 to create the dataloader. \\
-        The dataset was imported from Google Drive :)
+        a batch size of 8 to create the dataloader. The dataset was imported from Google Drive :)
         \item To visualize the data distribution across the dataset, I used pixel counts in
-        the mask - the frequency of pixels belonging to each of the classes. Due to computational
+        the masks - the frequency of pixels belonging to each of the classes. Due to computational
         limitations, the plot was generated only for a fraction of the dataset. The distribution
-        is given in the following figure.
+        is given in Figure (\ref{fig:pixel-counts}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.4\textwidth]{Assets/Segmentation/01}
+            \caption{Pixel Counts of each class (representing data distribution)}
+            \label{fig:pixel-counts}
+        \end{figure}
         \item For each class, I visualize the images and their masks (and show which class
         is being highlighted in each case). The masks were color coded according to the conventions
         of the IDD Dataset. The results are given in \texttt{segmentation-1.ipynb}, and a few
-        examples are given in the figure below.
+        examples are given in Figure (\ref{fig:masks}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/02}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/03}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/04}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/05}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/06}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Original/07}
+            \caption{Visualization of three images of every class}
+            \label{fig:masks}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 2.}}
@@ -350,8 +422,16 @@
         on 30\% IDD dataset (using it as test set). The inference was performed in the second
         notebook, which is GPU enabled.
         \item The classwise performances in terms of the given metrics were evaluated. The results
-        are given in the following table (Forgive me, I did not have enough time to present these
-        in a better manner).
+        are given in Figure (\ref{fig:metrics-screenshot}) (Forgive me, I did not have enough time to
+        present these in a better manner).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Metrics/01}
+            \includegraphics[width=0.335\textwidth]{Assets/Segmentation/Metrics/02}
+            \includegraphics[width=0.35\textwidth]{Assets/Segmentation/Metrics/03}
+            \caption{Evaluation Metrics for the Image Segmentation}
+            \label{fig:metrics-screenshot}
+        \end{figure}
         \item I visualize three images per class where the IoU between the predicted and true
         masks is at most 0.5. It was easy to notice the faults - in some cases, the IoU was close to
         0.48+, for example, in case of \texttt{Road}. In other cases, like \texttt{Sidewalk} or
@@ -360,33 +440,66 @@
         resulting in classes that occur on only a few pixels per image to be \textit{ignored}.
         In such cases, the surrounding objects and environment were overpowering the ground truth
         class. For example, most pixels of \texttt{Sidewalk} were being predicted as \texttt{Road}.
+        These \textit{bad IoU} examples are given in Figure (\ref{fig:bad-ious}).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/01}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/02}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/03}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/04}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/05}
+            \includegraphics[width=0.325\textwidth]{Assets/Segmentation/Bad-IoUs/06}
+            \caption{Examples of three images from each class with IoU $\leq$ 0.5}
+            \label{fig:bad-ious}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 3.}}
     \begin{enumerate}[label=(\alph*)]
-        \item The confusion matrix for the final segmentation was generated and is given in the following
-        figure. We can infer that classes like \texttt{Road} and \texttt{Sky} are being predicted well,
+        \item The confusion matrix for the final segmentation was generated and is given in Figure
+        (\ref{fig:deeplab-conf-matrix}). We can infer that classes like \texttt{Road} and \texttt{Sky} are being predicted well,
         but others were not - this is seen due to the low count of true positives on the diagonals
         corresponding to these classes. It is also noticable that most mistakes are being made in
         less frequent classes, which are being predicted as classes which are more prevalent.
-        \item The classwise precision, recall, and F1-scores were calculated and are given in the
-        following table (again, owing to the lack of time to present the results better). Again, it
-        is clear that the model needs improvements in classes which occur on a small fraction of an image,
-        for example classes like
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.5\textwidth]{Assets/Segmentation/Metrics/05}
+            \caption{Confusion Matrix for Image Segmentation on Indian Driving Dataset}
+            \label{fig:deeplab-conf-matrix}
+        \end{figure}
+        \item The classwise precision, recall, and F1-scores were calculated and are given in Figure
+        (\ref{fig:precision-recall-f1-screenshot}) (again, owing to the lack of time to present the
+        results better). Again, it is clear that the model needs improvements in classes which occur
+        on a small fraction of an image, for example classes like \texttt{Sidewalk}, \texttt{Train},
+        \texttt{Wall}, \texttt{Pole}, etc.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.5\textwidth]{Assets/Segmentation/Metrics/04}
+            \caption{Confusion Matrix for Image Segmentation on Indian Driving Dataset}
+            \label{fig:precision-recall-f1-screenshot}
+        \end{figure}
     \end{enumerate}
 
     \subsection*{\textbf{Question 4.}}
     \begin{enumerate}[label=(\alph*)]
         \item The GPU enabled notebook was used to perform inference on the Cityscapes dataset. Like before,
         the generated masks were stored in Google Drive.
-        \item The following figure shows the confusion matrix for these inferences, which are arguably better
+        \item Figure (\ref{fig:deeplab-2-conf-matrix}) shows the confusion matrix for these inferences, which are arguably better
         than the previous case. This is because the model was trained on Cityscapes dataset, and is hence able
         to recognize classes better. Now, more classes have a higher count of true positives (diagonal entries
         in the confusion matrix).
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.5\textwidth]{Assets/Segmentation/Metrics/06}
+            \caption{Confusion Matrix for Image Segmentation on Cityscapes Dataset}
+            \label{fig:deeplab-2-conf-matrix}
+        \end{figure}
         \item Similar to before, the worst performing class performs bad because it is being dominated by
         their environments containing classes like \texttt{Road}, \texttt{Vegetation}, and \texttt{Sky} -
         which span a larger area. Exactly these dominating classes perform well, since they were being predicted
-        \textit{more often} in a sense, and covering most of their true pixels.
+        \textit{more often} in a sense, and covering most of their true pixels. The best performing classes are
+        clearly \texttt{Road}, followed by \texttt{Sky} and \texttt{Vegetation}. The worst performing
+        classes are \texttt{Traffic\_Sign} and \texttt{Truck}.
     \end{enumerate}
 
 \end{document}
