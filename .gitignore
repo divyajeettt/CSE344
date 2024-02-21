@@ -10,5 +10,6 @@
 */*.pth
 */*.pt
 */wandb
+**/__pycache__
 Assignment-1/VAINF
 Assignment-1/DeepLabV3Plus-Resnet101.pth.tar
