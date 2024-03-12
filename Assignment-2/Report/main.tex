@@ -11,6 +11,7 @@
 
 
 \newcommand{\unit}[1]{\mathbf{\hat{#1}}}
+\newcommand{\orientation}[1]{\left[ \mathbf{R}_{#1} \mid \mathbf{t}_{#1} \right]}
 
 
 \title{
@@ -277,23 +278,76 @@
 
     \section*{\textbf{Question 3.}}
     We are given image formation equations of two cameras, $\mathbf{C}_{1}$ and
-    $\mathbf{C}_{2}$, for a 3D point $\mathbf{X}$ in the world, as follows
+    $\mathbf{C}_{2}$, for the same 3D point $\mathbf{X}$ in the world in homogeneous
+    coordinates, as follows
     \begin{align*}
-        \mathbf{x}_{1} &= \mathbf{K}_{1} \left[ \mathbf{R}_{1} \mid \mathbf{t}_{1} \right] \mathbf{X} \\
-        \mathbf{x}_{2} &= \mathbf{K}_{2} \left[ \mathbf{R}_{2} \mid \mathbf{t}_{2} \right] \mathbf{X}
+        \mathbf{x}_{1} &= \mathbf{K}_{1} \orientation{1} \mathbf{X} \\
+        \mathbf{x}_{2} &= \mathbf{K}_{2} \orientation{2} \mathbf{X}
     \end{align*}
-    We are given that the first camera frame of reference is known and is the world
-    coordinate frame. $\mathbf{C}_{2}$ is obtained by a pure 3D rotation $\mathbf{R}$
-    applied to $\mathbf{C}_{1}$. We need to show that the image points $\mathbf{x}_{1}$
-    and $\mathbf{x}_{2}$ are related by
+    where we assume that the extrinsic matrices
+    $\left[ \mathbf{R}_{i} \mid \mathbf{t}_{i} \right]_{3 \times 4}$, include the perspective projection
+    matrix $\begin{bmatrix} \mathbf{I} & \mathbf{0} \end{bmatrix}$. We need to show that the image
+    points are related by
     \begin{equation*}
         \mathbf{x}_{1} = \mathbf{H} \mathbf{x}_{2}
     \end{equation*}
     for some invertible $\mathbf{H}_{3 \times 3}$ and find it in terms of $\mathbf{K}_{1}$,
     $\mathbf{K}_{2}$, and $\mathbf{R}$. \\
-    We know that $\mathbf{C}_{2}$ is obtained by a 3D rotation $\mathbf{R}$ applied to
-    $\mathbf{C}_{1}$. This means that $\mathbf{C}_{1}$ can be obtained by applying the
-    inverse rotation of $\mathbf{R}$ to $\mathbf{C}_{2}$. Since $\mathbf{R}$ is an orthogonal
-    matrix, $\mathbf{R}^{-1} = \mathbf{R}^{\top}$.
+    Given that the orientation of $\mathbf{C}_{2}$ is obtained by applying a 3D rotation
+    $\mathbf{R}$ on $\mathbf{C}_{1}$, which means
+    \begin{equation*}
+        \orientation{2} = \mathbf{R} \orientation{1}
+   \end{equation*}
+    where the last equality follows as $\mathbf{R}$ is an orthogonal matrix. Then, we have
+    \begin{align*}
+            \mathbf{x}_{1} &= \mathbf{H} \mathbf{x}_{2} \\
+            \mathbf{x}_{1} &= \mathbf{H} \mathbf{K}_{2} \orientation{2} \mathbf{X} \\
+            \mathbf{K}_{1} \orientation{1} \mathbf{X} &= \mathbf{H} \mathbf{K}_{2} \mathbf{R}
+            \orientation{1} \mathbf{X} \\
+            \implies \mathbf{K}_{1} \orientation{1} &= \mathbf{H} \mathbf{K}_{2} \mathbf{R} \orientation{1}
+            \quad \text{since } \mathbf{X} \text{ is arbitrary}
+    \end{align*}
+    At this point, it is important to consider the shape of the matrices involved. We have
+    \begin{equation*}
+        \underbrace{\mathbf{K}_{1}}_{3 \times 3} \underbrace{\orientation{1}}_{3 \times 4} =
+        \underbrace{\mathbf{H}}_{3 \times 3} \underbrace{\mathbf{K}_{2}}_{3 \times 3}
+        \underbrace{\mathbf{R}}_{3 \times 3} \underbrace{\orientation{1}}_{3 \times 4}
+    \end{equation*}
+    Note that $\orientation{1}$ is not invertible. However, we do not need to invert it. Since the
+    operands to the right remain the same, it is sufficient to find $\mathbf{H}$ such that the
+    \begin{align*}
+        \mathbf{K}_{1} &= \mathbf{H} \mathbf{K}_{2} \mathbf{R} \\
+        \implies \mathbf{K}_{1} \mathbf{R}^{T} &= \mathbf{H} \mathbf{K}_{2} \\
+        \implies \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} &= \mathbf{H}
+    \end{align*}
+    Therefore, the matrix $\mathbf{H} = \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1}$ gives the
+    required relation between the image points. Finally, we show two properties of $\mathbf{H}$
+    \begin{enumerate}
+        \item $\mathbf{H}$ is of size $3 \times 3$. This is easy to see as
+        \begin{equation*}
+            \underbrace{\mathbf{H}}_{3 \times 3} = \underbrace{\mathbf{K}_{1}}_{3 \times 3}
+            \underbrace{\mathbf{R}^{T}}_{3 \times 3} \underbrace{\mathbf{K}_{2}^{-1}}_{3 \times 3}
+        \end{equation*}
+
+        \item $\mathbf{H}$ is invertible. This is also easy to see as
+        \begin{equation*}
+            \mathbf{H}^{-1} = \left( \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \right)^{-1}
+            = \mathbf{K}_{2} \mathbf{R} \mathbf{K}_{1}^{-1}
+        \end{equation*}
+        where we crucially use the fact that $\mathbf{R}$ is an orthogonal matrix, and $\mathbf{K}_{1}$
+        and $\mathbf{K}_{2}$ are invertible since they are upper triangular matrices with non-zero
+        entries (number of pixels) on their principal diagonals.
+    \end{enumerate}
+    We can verify the correctness of the result by substituting the obtained $\mathbf{H}$ into the
+    required relation. We have
+    \begin{align*}
+        \mathbf{x}_{1} &= \mathbf{H} \mathbf{x}_{2} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \mathbf{x}_{2} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \mathbf{K}_{2} \orientation{2} \mathbf{X} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{T} \orientation{2} \mathbf{X} \\
+        &= \mathbf{K}_{1} \orientation{1} \mathbf{X} \\
+        &= \mathbf{x}_{1}
+    \end{align*}
+    since $\orientation{2} = \mathbf{R} \orientation{1} \implies \mathbf{R}^{T} \orientation{2} = \orientation{1}$.
 
 \end{document}
