@@ -235,7 +235,7 @@
                 0 & 1 & 1 \\
                 -1 & 0 & 1 \\
                 -1 & -1 & 0
-            \end{bmatrix} + \frac{1}{6} \begin{bmatrix}
+            \end{bmatrix} + \frac{1}{2} \begin{bmatrix}
                 -2 & -1 & 1 \\
                 -1 & -2 & -1 \\
                 1 & -1 & -2
@@ -299,7 +299,7 @@
     \begin{equation*}
         \orientation{2} = \mathbf{R} \orientation{1}
    \end{equation*}
-    where the last equality follows as $\mathbf{R}$ is an orthogonal matrix. Then, we have
+    Then, we have
     \begin{align*}
             \mathbf{x}_{1} &= \mathbf{H} \mathbf{x}_{2} \\
             \mathbf{x}_{1} &= \mathbf{H} \mathbf{K}_{2} \orientation{2} \mathbf{X} \\
@@ -308,7 +308,7 @@
             \implies \mathbf{K}_{1} \orientation{1} &= \mathbf{H} \mathbf{K}_{2} \mathbf{R} \orientation{1}
             \quad \text{since } \mathbf{X} \text{ is arbitrary}
     \end{align*}
-    At this point, it is important to consider the shape of the matrices involved. We have
+    At this point, it is important to consider the shapes of the matrices involved. We have
     \begin{equation*}
         \underbrace{\mathbf{K}_{1}}_{3 \times 3} \underbrace{\orientation{1}}_{3 \times 4} =
         \underbrace{\mathbf{H}}_{3 \times 3} \underbrace{\mathbf{K}_{2}}_{3 \times 3}
