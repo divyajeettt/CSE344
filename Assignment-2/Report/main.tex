@@ -35,7 +35,7 @@
         \begin{enumerate}[label=(\alph*)]
             \item Rotation by $\frac{\pi}{2}$ about the $Y$-axis
             \item Rotation by $\frac{-\pi}{2}$ about the $X$-axis
-            \item Translation by $\begin{bmatrix} -1 & 3 & 2 \end{bmatrix}^{\top}$
+            \item Translation by $t = \begin{bmatrix} -1 & 3 & 2 \end{bmatrix}^{\top}$
         \end{enumerate}
         The coordinate transformation matrices (using 3-dimensional homogeneous coordinates),
         for the three transformations are
@@ -62,7 +62,7 @@
                 0 & -1 & 0 & 0 \\
                 0 & 0 & 0 & 1
             \end{bmatrix} \\
-            T\left(\begin{bmatrix} -1 \\ 3 \\ 2 \end{bmatrix}\right) &= \begin{bmatrix}
+            T(t) &= \begin{bmatrix}
                 1 & 0 & 0 & -1 \\
                 0 & 1 & 0 & 3 \\
                 0 & 0 & 1 & 2 \\
@@ -71,9 +71,8 @@
         \end{align*}
         The coordinate transformation matrix for the full transformation is then given by
         \begin{align*}
-            T &= T\left(\begin{bmatrix} -1 \\ 3 \\ 2 \end{bmatrix}\right) \circ
-                R_{x}\left(\frac{-\pi}{2}\right) \circ R_{y}\left(\frac{\pi}{2}\right) \\
-            &= T\left(\begin{bmatrix} -1 \\ 3 \\ 2 \end{bmatrix}\right) \begin{bmatrix}
+            T &= T(t) \circ R_{x}\left(\frac{-\pi}{2}\right) \circ R_{y}\left(\frac{\pi}{2}\right) \\
+            &= T(t) \begin{bmatrix}
                 1 & 0 & 0 & 0 \\
                 0 & 0 & 1 & 0 \\
                 0 & -1 & 0 & 0 \\
