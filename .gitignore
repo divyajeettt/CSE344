@@ -11,5 +11,7 @@
 */*.pt
 */wandb
 **/__pycache__
+**/*.npy
+**/*.pkl
 Assignment-1/VAINF
 Assignment-1/DeepLabV3Plus-Resnet101.pth.tar
