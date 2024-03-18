@@ -1,5 +1,7 @@
 \documentclass[10pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[export]{adjustbox}
+\usepackage{longtable}
 \usepackage{geometry}
 \usepackage{amsfonts}
 \usepackage{hyperref}
@@ -12,6 +14,7 @@
 
 \newcommand{\unit}[1]{\mathbf{\hat{#1}}}
 \newcommand{\orientation}[1]{\left[ \mathbf{R}_{#1} \mid \mathbf{t}_{#1} \right]}
+\newcommand{\figref}[1]{Figure (\ref{fig:#1})}
 
 
 \title{
@@ -318,21 +321,21 @@
     operands to the right remain the same, it is sufficient to find $\mathbf{H}$ such that the
     \begin{align*}
         \mathbf{K}_{1} &= \mathbf{H} \mathbf{K}_{2} \mathbf{R} \\
-        \implies \mathbf{K}_{1} \mathbf{R}^{T} &= \mathbf{H} \mathbf{K}_{2} \\
-        \implies \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} &= \mathbf{H}
+        \implies \mathbf{K}_{1} \mathbf{R}^{\top} &= \mathbf{H} \mathbf{K}_{2} \\
+        \implies \mathbf{K}_{1} \mathbf{R}^{\top} \mathbf{K}_{2}^{-1} &= \mathbf{H}
     \end{align*}
-    Therefore, the matrix $\mathbf{H} = \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1}$ gives the
+    Therefore, the matrix $\mathbf{H} = \mathbf{K}_{1} \mathbf{R}^{\top} \mathbf{K}_{2}^{-1}$ gives the
     required relation between the image points. Finally, we show two properties of $\mathbf{H}$
     \begin{enumerate}
         \item $\mathbf{H}$ is of size $3 \times 3$. This is easy to see as
         \begin{equation*}
             \underbrace{\mathbf{H}}_{3 \times 3} = \underbrace{\mathbf{K}_{1}}_{3 \times 3}
-            \underbrace{\mathbf{R}^{T}}_{3 \times 3} \underbrace{\mathbf{K}_{2}^{-1}}_{3 \times 3}
+            \underbrace{\mathbf{R}^{\top}}_{3 \times 3} \underbrace{\mathbf{K}_{2}^{-1}}_{3 \times 3}
         \end{equation*}
 
         \item $\mathbf{H}$ is invertible. This is also easy to see as
         \begin{equation*}
-            \mathbf{H}^{-1} = \left( \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \right)^{-1}
+            \mathbf{H}^{-1} = \left( \mathbf{K}_{1} \mathbf{R}^{\top} \mathbf{K}_{2}^{-1} \right)^{-1}
             = \mathbf{K}_{2} \mathbf{R} \mathbf{K}_{1}^{-1}
         \end{equation*}
         where we crucially use the fact that $\mathbf{R}$ is an orthogonal matrix, and $\mathbf{K}_{1}$
@@ -343,12 +346,181 @@
     required relation. We have
     \begin{align*}
         \mathbf{x}_{1} &= \mathbf{H} \mathbf{x}_{2} \\
-        &= \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \mathbf{x}_{2} \\
-        &= \mathbf{K}_{1} \mathbf{R}^{T} \mathbf{K}_{2}^{-1} \mathbf{K}_{2} \orientation{2} \mathbf{X} \\
-        &= \mathbf{K}_{1} \mathbf{R}^{T} \orientation{2} \mathbf{X} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{\top} \mathbf{K}_{2}^{-1} \mathbf{x}_{2} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{\top} \mathbf{K}_{2}^{-1} \mathbf{K}_{2} \orientation{2} \mathbf{X} \\
+        &= \mathbf{K}_{1} \mathbf{R}^{\top} \orientation{2} \mathbf{X} \\
         &= \mathbf{K}_{1} \orientation{1} \mathbf{X} \\
         &= \mathbf{x}_{1}
     \end{align*}
-    since $\orientation{2} = \mathbf{R} \orientation{1} \implies \mathbf{R}^{T} \orientation{2} = \orientation{1}$.
+    since $\orientation{2} = \mathbf{R} \orientation{1} \implies \mathbf{R}^{\top} \orientation{2} = \orientation{1}$.
+
+    \section*{\textbf{Question 4. (Camera Calibration)}}
+    We are required to perform camera calibration with a set of 25 images of
+    a chessboard pattern. A chessboard pattern of size $5 \times 7$ (given in
+    [1]) was used for the calibration. The final set of images used for the
+    camera calibration is given in \figref{final-image-set}. The images
+    are numbered 1 to 25 from top-left to bottom-right. The resolution of the
+    images is $4032 \times 3024$. \\
+    The images were taken by placing the chessboard pattern on a flat surface
+    and capturing the images from different angles and distances, capturing all
+    degrees of freedom, esuring that the corners are clearly visible in each image.
+    The code for this question is given in \texttt{camera-calibration.ipynb}.
+    \begin{figure}[htbp]
+        \begin{center}
+            \includegraphics[width=0.875\textwidth]{Assets/Question-4/final-image-set.png}
+            \caption{Chessboard pattern used for camera calibration}
+            \label{fig:final-image-set}
+        \end{center}
+    \end{figure}
+    \begin{enumerate}
+        \item We estimate the intrinsic camera parameters using the images. The following
+        intrinsic matrix was obtained.
+        \begin{equation*}
+            \mathbf{K} = \begin{bmatrix}
+                f_{x} & s & c_{x} \\
+                0 & f_{y} & c_{y} \\
+                0 & 0 & 1
+            \end{bmatrix} = \begin{bmatrix}
+                3127.88 & 0.0 & 1508.31 \\
+                0.0 & 3122.10 & 2013.85 \\
+                0 & 0 & 1
+            \end{bmatrix}
+        \end{equation*}
+        inidicating that (rounded off to the nearest integer) the focal length in the
+        $x$ and $y$ directions is $f_{x} \approx 3128$ and $f_{y} \approx 3122$  respectively.
+        The principal point is $(c_{x}, c_{y}) \approx (1508, 2014)$. The skew parameter is
+        $s = 0$.
+
+        \item We estimate the extrinsic camera parameters for each of the 25 images. A few of
+        the results are given in Table \ref{tab:extrinsic-parameters}. The figures are rounded
+        off to one decimal place for brevity. The precise parameters for each image can be found
+        in the notebook.
+        \begin{longtable}{c|c|c}
+            \textsc{Image} & \textsc{Rotation Matrix} & \textsc{Translation Vector} \\
+            \hline & & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/01.jpg}
+            & $\begin{bmatrix}
+                1.0 & 0.0 & 0.0 \\
+                0.0 & 1.0 & 0.0 \\
+                0.0 & 0.0 & 1.0
+            \end{bmatrix}$ & $\begin{bmatrix} -1.2 \\ -2.5 \\ 9.9 \end{bmatrix}$ \\
+            & & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/02.jpg}
+            & $\begin{bmatrix}
+                0.9 & -0.1 & -0.3 \\
+                0.1 & 0.9 & -0.4 \\
+                0.3 & 0.4 & 0.8
+            \end{bmatrix}$ & $\begin{bmatrix} -1.1 \\ -0.5 \\ 9.1 \end{bmatrix}$ \\
+            & & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/03.jpg}
+            & $\begin{bmatrix}
+                0.1 & -0.9 & -0.4 \\
+                0.9 & 0.2 & -0.2 \\
+                0.2 & -0.3 & 0.9
+            \end{bmatrix}$ & $\begin{bmatrix} -13.2 \\ -23.5 \\ 48.4 \end{bmatrix}$ \\
+            & & \\
+            \caption{Extrinsic camera parameters for the first three images}
+            \label{tab:extrinsic-parameters}
+        \end{longtable}
+
+        \item We estimate the distortion parameters, specifically the tangenial and
+        radial distortion parameters using the images. The following distortion vector
+        was obtained.
+        \begin{equation*}
+            \mathbf{D} = \begin{bmatrix}
+                k_{1} & k_{2} & p_{1} & p_{2} & k_{3}
+            \end{bmatrix} = \begin{bmatrix}
+                0.223 & -1.141 & -0.001 & -0.001 & 0.983
+            \end{bmatrix}
+        \end{equation*}
+        indicating that the radial distortion coefficients are $k_{1} = 0.223$,
+        $k_{2} = -1.141$, and $k_{3} = 0.983$. We then use these parameters to undisort
+        5 images and compare the results with the original images. The comparison us given
+        in \figref{distortions}.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-4/distortions.png}
+                \caption{Comparison of 5 original and undisorted images}
+                \label{fig:distortions}
+            \end{center}
+        \end{figure}
+        \vspace*{0pt} \\
+        We can see that on the edges/corners of the undisorted images, the straight lines
+        appear to be curved; for example, in image 24, the edges of the tables behind the
+        chessboard appear to be curved inward, i.e. showing negative curvature. Similar
+        effects can be seen in image 9 and 12.
+
+        \item We compute the reprojection error using the estimated intrinsic and extrinsic
+        parameters of each of the 25 images. A bar chart of the reprojection errors is given
+        in \figref{reprojection-error}.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-4/reprojection-error.png}
+                \caption{Reprojection error for each of the 25 images}
+                \label{fig:reprojection-error}
+            \end{center}
+        \end{figure}
+        \vspace*{0pt} \\
+        The mean reprojection error is $0.40$ pixels, with a standard deviation of $0.16$ pixels.
+
+        \item We plot the figures of the chessboards showing the dettected corners and the
+        corners after reprojecting them using the estimated intrinsic and extrinsic parameters.
+        The figures are given in \figref{corners}. In the figure, the red crosses are the
+        detected corners, while the blue circles are the reprojected corners. The images are
+        ordered as before.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-4/corners.png}
+                \caption{Detected and reprojected corners of the chessboard}
+                \label{fig:corners}
+            \end{center}
+        \end{figure}
+        Reprojection error is computed as the average of the Euclidean distances between the
+        detected and reprojected corners, i.e.
+        \begin{equation*}
+            \mathbf{e}(\mathbf{c}, \mathbf{c'}) =
+            \frac{1}{N} \sum_{i=1}^{N} \left\| \mathbf{c}_{i} - \mathbf{c'}_{i} \right\|_{2}
+        \end{equation*}
+        where $\mathbf{c}_{i}$ and $\mathbf{c'}_{i}$ are the observed and reprojected
+        2D coordinates of the $i$-th corner, and $N$ is the number of corners.
+
+        \item We compute the chessboard plane normals $\mathbf{\hat{n}}_{i}^{C}$ in the
+        camera coordinate frame for each image. The normals are given in Table
+        \ref{tab:plane-normals}. The figures are rounded off to two decimal places for
+        brevity. The precise parameters for each image can be found in the notebook.
+        \begin{longtable}{c|c}
+            \textsc{Image} & \textsc{Plane Normal} \\
+            \hline & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/01.jpg}
+            & $\begin{bmatrix} -0.03 & -0.01 & 0.99 \end{bmatrix}^{\top}$ \\
+            & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/02.jpg}
+            & $\begin{bmatrix} -0.27 & -0.40 & 0.87 \end{bmatrix}^{\top}$ \\
+            & \\
+            \includegraphics[width=0.075\textwidth, valign=c]{Assets/Camera-Calibration/03.jpg}
+            & $\begin{bmatrix} -0.42 & -0.16 & 0.89 \end{bmatrix}^{\top}$ \\
+            & \\
+            \caption{Plane normals for the first three images}
+            \label{tab:plane-normals}
+        \end{longtable}
+        As opposed to just numbers, we can visualize the normals on the chessboard. This
+        was done by projecting the normal to the chessboard on the image. The figures are
+        given in \figref{normals}. The normals are shown as red lines on the chessboard,
+        while the green diagonals indicate the chessboard plane.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-4/normals.png}
+                \caption{Plane normals for each of the 25 images}
+                \label{fig:normals}
+            \end{center}
+        \end{figure}
+    \end{enumerate}
+
+    \section*{References}
+    \begin{enumerate}
+        \item \href{https://learnopencv.com/camera-calibration-using-opencv/}{
+            Camera Calibration using OpenCV
+        }
+    \end{enumerate}
 
 \end{document}
