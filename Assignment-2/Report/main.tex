@@ -652,12 +652,25 @@
                 \label{fig:normals-lidar}
             \end{center}
         \end{figure}
+        \vspace*{0pt} \\
         It can be seen that the transformed LIDAR normals are close to the camera normals,
         whereas the plain LIDAR normals are not. This is expected, as the transformation
         matrix maps LIDAR points (and therefore vectors) to the camera coordinate frame.
         The normals were plotted on the chessboard pattern by finding the centroid of the
         LIDAR points, and then plotting an arrow from the centroid to a few units in the
-        direction of the normal.
+        direction of the normal. \\
+        We then calculate the cosine distance (normalized to $[0, 1]$) between the camera
+        normals and the transformed LIDAR normals. Since the norm of the normals is 1, we
+        simply take their dot product and scale it to $[0, 1]$. The distribution of these
+        errors is given in \figref{cosine-distances}.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-5/cosine-distances.png}
+                \caption{Cosine distance between camera and transformed LIDAR normals}
+                \label{fig:cosine-distances}
+            \end{center}
+        \end{figure}
+        The mean cosine distance is $0.0003$, with a standard deviation of $0.0014$.
     \end{enumerate}
 
     \section*{\textbf{References}}
