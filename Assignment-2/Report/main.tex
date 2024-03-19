@@ -447,8 +447,8 @@
         \vspace*{0pt} \\
         We can see that on the edges/corners of the undisorted images, the straight lines
         appear to be curved; for example, in image 24, the edges of the tables behind the
-        chessboard appear to be curved inward, i.e. showing negative curvature. Similar
-        effects can be seen in image 9 and 12.
+        chessboard appear to be curved inward, i.e. showing negative curvature. This is
+        due to radial distortion. Similar effects are seen in images 9 and 12.
 
         \item We compute the reprojection error using the estimated intrinsic and extrinsic
         parameters of each of the 25 images. A bar chart of the reprojection errors is given
@@ -574,10 +574,8 @@
             \label{tab:lidar-normals}
         \end{longtable}
 
-        \item Now we derive the equations.
-
-        \item Using the above equations, we estimate the LIDAR-to-Camera transformation
-        matrix. Using the closed form solution given in the thesis [2], if
+        \item We estimate the LIDAR-to-Camera transformation matrix. Using the closed form solution
+        given in the thesis [2], if
         \begin{equation*}
             \mathbf{n}_{C} = \begin{bmatrix}
                 \hat{\mathbf{n}}_{1}^{(C)} \\ \hat{\mathbf{n}}_{2}^{(C)} \\ \vdots \\ \hat{\mathbf{n}}_{N}^{(C)}
@@ -609,8 +607,22 @@
                 \mathbf{R}_{L} \mid \ ^{C} t_{L}
             \end{bmatrix}_{4 \times 3}
         \end{equation*}
-        The above closed form solution was implemented in the notebook to estimate the
-        transformation matrix. The following transformation matrix was obtained
+        The above equations suggest that the translation vector $^{C} t_{L}$ is obtained
+        as the solution to the equation
+        \begin{equation*}
+            \mathbf{n}_{C} \cdot \ ^{C} t_{L} = \mathbf{d}_{C} - \mathbf{d}_{L}
+        \end{equation*}
+        which makes sense, as the dot product of the normal and the translation vector
+        gives the distance of the plane from the origin. The rotation matrix
+        $^{C} \mathbf{R}_{L}$ is obtained as the product of the orthogonal matrices
+        $V$ and $U^{\top}$ from the SVD of $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$. This
+        also aligns with intuition, since the SVD of a linear transform (in our case
+        $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$) into a rotation/reflection $V^{\top}$,
+        followed by a scaling $\Sigma$, and another rotation $U$. So the rotation matrix
+        is obtained as the composition of both rotations.
+
+        \item The above closed form solution was implemented in the notebook to estimate
+        the transformation matrix. We use it to obtain the following transformation matrix
         (rounded off to two decimal places for brevity).
         \begin{equation*}
             ^{C} \mathbf{\tilde{T}}_{L} = \begin{bmatrix}
@@ -626,7 +638,16 @@
         map the LIDAR points to the camera coordinate frame, and then project them to
         the image plane using the camera's (given) intrinsic parameters and the (given)
         extrinsic parameters for each image. The figures are given in
-        \figref{lidar-projection}.
+        \figref{lidar-projection}. The points were transformed from the LIDAR coordinates
+        to image coordinates using the following equation
+        \begin{equation*}
+            \mathbf{X}^{(C)} = \mathbf{K} \ ^{C} \mathbf{\tilde{T}}_{L} \
+            \left( \mathbf{X}^{(L)} \right) ^{\top}
+        \end{equation*}
+        where $\mathbf{X}^{(C)}$ is the $3 \times N$ matrix of points in the homogeneous
+        camera coordantes, $\mathbf{K}$ is the intrinsic camera matrix, and
+        $\mathbf{X}^{(L)}$ is the $4 \times N$ matrix of points in the homogeneous LIDAR
+        coordinates.
         \begin{figure}[htbp]
             \begin{center}
                 \includegraphics[width=0.875\textwidth]{Assets/Question-5/projection.png}
@@ -639,7 +660,7 @@
         right of the checkerboard. However, the points are close by. This could be due to
         the error in estimating the transformation matrix.
 
-        \item We plot the normal vectors $\mathbf{\hat{n}}_{i}^{L}$, $\mathbf{\hat{n}}_{i}^{C}$,
+        \item We plot the normals $\mathbf{\hat{n}}_{i}^{L}$, $\mathbf{\hat{n}}_{i}^{C}$,
         and $^{C} \mathbf{R}_{L} \mathbf{\hat{n}}_{i}^{L}$ for 5 selected images. The
         figure is given in \figref{normals-lidar}. In the figure, the blue normals are
         the LIDAR normals $\mathbf{\hat{n}}_{i}^{L}$, the green normals are the camera
@@ -653,16 +674,12 @@
             \end{center}
         \end{figure}
         \vspace*{0pt} \\
-        It can be seen that the transformed LIDAR normals are close to the camera normals,
-        whereas the plain LIDAR normals are not. This is expected, as the transformation
-        matrix maps LIDAR points (and therefore vectors) to the camera coordinate frame.
-        The normals were plotted on the chessboard pattern by finding the centroid of the
-        LIDAR points, and then plotting an arrow from the centroid to a few units in the
-        direction of the normal. \\
-        We then calculate the cosine distance (normalized to $[0, 1]$) between the camera
-        normals and the transformed LIDAR normals. Since the norm of the normals is 1, we
-        simply take their dot product and scale it to $[0, 1]$. The distribution of these
-        errors is given in \figref{cosine-distances}.
+        The transformed LIDAR normals are close to the camera normals, whereas the LIDAR
+        normals are not. This is expected, as the transformation matrix maps LIDAR points
+        (and therefore vectors) to the camera coordinate frame. \\
+        We calculate the cosine distance (normalized to $[0, 1]$) between the camera
+        normals and the transformed LIDAR normals. The distribution of these errors is
+        given in \figref{cosine-distances}.
         \begin{figure}[htbp]
             \begin{center}
                 \includegraphics[width=0.875\textwidth]{Assets/Question-5/cosine-distances.png}
@@ -670,9 +687,12 @@
                 \label{fig:cosine-distances}
             \end{center}
         \end{figure}
+        \vspace*{0pt} \\
         The mean cosine distance is $0.0003$, with a standard deviation of $0.0014$.
     \end{enumerate}
+    \pagebreak
 
+    \vspace*{0pt} \vfill
     \section*{\textbf{References}}
     \begin{enumerate}
         \item \href{https://learnopencv.com/camera-calibration-using-opencv/}{
