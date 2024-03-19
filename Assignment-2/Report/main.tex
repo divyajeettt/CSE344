@@ -339,8 +339,8 @@
             = \mathbf{K}_{2} \mathbf{R} \mathbf{K}_{1}^{-1}
         \end{equation*}
         where we crucially use the fact that $\mathbf{R}$ is an orthogonal matrix, and $\mathbf{K}_{1}$
-        and $\mathbf{K}_{2}$ are invertible since they are upper triangular matrices with non-zero
-        entries (number of pixels) on their principal diagonals.
+        and $\mathbf{K}_{2}$ are invertible since they are upper triangular, with non-zero
+        entries ((possibly scaled) focal lengths) on their principal diagonals.
     \end{enumerate}
     We can verify the correctness of the result by substituting the obtained $\mathbf{H}$ into the
     required relation. We have
@@ -463,7 +463,7 @@
         \vspace*{0pt} \\
         The mean reprojection error is $0.40$ pixels, with a standard deviation of $0.16$ pixels.
 
-        \item We plot the figures of the chessboards showing the dettected corners and the
+        \item We plot the figures of the chessboards showing the detected corners and the
         corners after reprojecting them using the estimated intrinsic and extrinsic parameters.
         The figures are given in \figref{corners}. In the figure, the red crosses are the
         detected corners, while the blue circles are the reprojected corners. The images are
@@ -503,10 +503,9 @@
             \caption{Plane normals for the first three images}
             \label{tab:plane-normals}
         \end{longtable}
-        As opposed to just numbers, we can visualize the normals on the chessboard. This
-        was done by projecting the normal to the chessboard on the image. The figures are
-        given in \figref{normals}. The normals are shown as red lines on the chessboard,
-        while the green diagonals indicate the chessboard plane.
+        As opposed to just numbers, we can visualize the normals on the chessboard. The
+        figures are given in \figref{normals}. The normals are shown as red lines on the
+        chessboard, while the green diagonals indicate the chessboard plane.
         \begin{figure}[htbp]
             \begin{center}
                 \includegraphics[width=0.875\textwidth]{Assets/Question-4/normals.png}
@@ -617,9 +616,9 @@
         $^{C} \mathbf{R}_{L}$ is obtained as the product of the orthogonal matrices
         $V$ and $U^{\top}$ from the SVD of $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$. This
         also aligns with intuition, since the SVD of a linear transform (in our case
-        $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$) into a rotation/reflection $V^{\top}$,
-        followed by a scaling $\Sigma$, and another rotation $U$. So the rotation matrix
-        is obtained as the composition of both rotations.
+        $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$) decomposes it into a rotation/reflection
+        $V^{\top}$, followed by a scaling $\Sigma$, and another rotation $U$. So the
+        rotation matrix is obtained as the composition of both rotations.
 
         \item The above closed form solution was implemented in the notebook to estimate
         the transformation matrix. We use it to obtain the following transformation matrix
