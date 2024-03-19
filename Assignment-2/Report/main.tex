@@ -355,7 +355,7 @@
     since $\orientation{2} = \mathbf{R} \orientation{1} \implies \mathbf{R}^{\top} \orientation{2} = \orientation{1}$.
 
     \section*{\textbf{Question 4. (Camera Calibration)}}
-    We are required to perform camera calibration with a set of 25 images of
+    We are required to perform Camera Calibration with a set of 25 images of
     a chessboard pattern. A chessboard pattern of size $5 \times 7$ (given in
     [1]) was used for the calibration. The final set of images used for the
     camera calibration is given in \figref{final-image-set}. The images
@@ -515,11 +515,158 @@
             \end{center}
         \end{figure}
     \end{enumerate}
+    \pagebreak
 
-    \section*{References}
+    \section*{\textbf{Question 5. (Camera-LIDAR Cross-Calibration)}}
+    We are required to perform Camera-LIDAR Cross-Calibration with the given set of
+    images and their corresponding LIDAR scans. From the given dataset, we choose a
+    set of 25 images to perform the cross-calibration, which are given in
+    \figref{final-lidar-set}. The code for this question is given in
+    \texttt{LIDAR-cross-calibration.ipynb}.
+    \begin{figure}[htbp]
+        \begin{center}
+            \includegraphics[width=0.875\textwidth]{Assets/Question-5/final-image-set.png}
+            \caption{Images used for camera-LIDAR cross-calibration}
+            \label{fig:final-lidar-set}
+        \end{center}
+    \end{figure}
+    \begin{enumerate}
+        \item We first compute the chessboard plane normals $\mathbf{\hat{n}}_{i}^{L}$ in
+        in the LIDAR coordinate frame using the points given in the \texttt{.pcd} files
+        and their corresponding offsets. We calculate the normals using singular value
+        decomposition (SVD) of the matrix of points as follows. For the $i^{th}$ scan, let
+        \begin{equation*}
+            X_{N \times 3}^{(i)} = \begin{bmatrix}
+                \mathbf{x}_{1}^{(i)} & \mathbf{x}_{2}^{(i)} & \cdots & \mathbf{x}_{N}^{i}
+            \end{bmatrix}^{\top}
+        \end{equation*}
+        be the matrix of points in the LIDAR coordinate frame, where each
+        $\mathbf{x}_{j}^{(i)}$ is a 3D point and $N$ is the number of points. Then, the
+        normal $\mathbf{\hat{n}}_{i}^{L}$ to the plane of the points is given by the
+        rightmost column of the matrix $V$ where
+        \begin{equation*}
+            X^{(i)} - \mathbf{\bar{x}}^{(i)} = U \Sigma V^{\top}
+        \end{equation*}
+        is the singular value decomposition of the matrix of centered points
+        $X^{(i)} - \mathbf{\bar{x}}^{(i)}$, where $\mathbf{\bar{x}}^{(i)}$ is the centroid
+        or mean of the points. The offset is simply
+        \begin{equation*}
+            \theta_{i} = \mathbf{\hat{n}}_{i}^{L} \cdot \mathbf{\bar{x}}^{(i)}
+        \end{equation*}
+        which is the scalar in the equation of the plane. In case the offset is negative,
+        we negate the normal and the offset. The normals and offsets for the first three
+        scans are given in Table \ref{tab:lidar-normals}. The figures are rounded off to
+        two decimal places for brevity. The precise parameters for each scan can be found
+        in the notebook.
+        \begin{longtable}{c|c|c}
+            \textsc{Scan} & \textsc{Plane Normal} & \textsc{Offset} \\
+            \hline & & \\
+            \includegraphics[width=0.2\textwidth, valign=c]{../Datasets/LIDAR/camera_images/frame_1061.jpeg}
+            & $\begin{bmatrix} 0.64 & -0.77 & 0.1 \end{bmatrix}^{\top}$ & $5.0$ \\
+            & & \\
+            \includegraphics[width=0.2\textwidth, valign=c]{../Datasets/LIDAR/camera_images/frame_1075.jpeg}
+            & $\begin{bmatrix} 0.7 & -0.7 & 0.12 \end{bmatrix}^{\top}$ & $4.72$ \\
+            & & \\
+            \includegraphics[width=0.2\textwidth, valign=c]{../Datasets/LIDAR/camera_images/frame_1093.jpeg}
+            & $\begin{bmatrix} 0.94 & -0.23 & 0.26 \end{bmatrix}^{\top}$ & $5.2$ \\
+            & & \\
+            \caption{Plane normals and offsets for the first three LIDAR scans}
+            \label{tab:lidar-normals}
+        \end{longtable}
+
+        \item Now we derive the equations.
+
+        \item Using the above equations, we estimate the LIDAR-to-Camera transformation
+        matrix. Using the closed form solution given in the thesis [2], if
+        \begin{equation*}
+            \mathbf{n}_{C} = \begin{bmatrix}
+                \hat{\mathbf{n}}_{1}^{(C)} \\ \hat{\mathbf{n}}_{2}^{(C)} \\ \vdots \\ \hat{\mathbf{n}}_{N}^{(C)}
+            \end{bmatrix}_{N \times 3} \quad
+            \mathbf{n}_{L} = \begin{bmatrix}
+                \hat{\mathbf{n}}_{1}^{(L)} \\ \hat{\mathbf{n}}_{2}^{(L)} \\ \vdots \\ \hat{\mathbf{n}}_{N}^{(L)}
+            \end{bmatrix}_{N \times 3} \quad
+            \mathbf{d}_{C} = \begin{bmatrix}
+                d_{1}^{(C)} \\ d_{2}^{(C)} \\ \vdots \\ d_{N}^{(C)}
+            \end{bmatrix}_{N \times 1} \quad
+            \mathbf{d}_{L} = \begin{bmatrix}
+                d_{1}^{(L)} \\ d_{2}^{(L)} \\ \vdots \\ d_{N}^{(L)}
+            \end{bmatrix}_{N \times 1}
+        \end{equation*}
+        then
+        \begin{align*}
+            ^{C} t_{L} &= (\mathbf{n}_{C}^{\top} \mathbf{n}_{C})^{-1} \mathbf{n}_{C}^{\top} (d_{C} - d_{L}) \\
+            ^{C} \mathbf{R}_{L} &= V U^{\top} \quad \text{if} \quad
+            \mathbf{n}_{L}^{\top} \mathbf{n}_{C} = U \Sigma V^{\top}
+        \end{align*}
+        where $\mathbf{n}_{C}$ and $\mathbf{n}_{L}$ are the matrices of normals in the
+        camera and LIDAR coordinate frames, $N$ is the number of points, $\mathbf{d}_{C}$
+        and $\mathbf{d}_{L}$ are the vectors of offsets in the camera and LIDAR coordinate
+        frames, and $U$, $\Sigma$, and $V$ are the matrices obtained from the singular
+        value decomposition of $\mathbf{n}_{L}^{\top} \mathbf{n}_{C}$. Then, the
+        transformation matrix is simply
+        \begin{equation*}
+            ^{C} \mathbf{\tilde{T}}_{L} = \begin{bmatrix} ^{C}
+                \mathbf{R}_{L} \mid \ ^{C} t_{L}
+            \end{bmatrix}_{4 \times 3}
+        \end{equation*}
+        The above closed form solution was implemented in the notebook to estimate the
+        transformation matrix. The following transformation matrix was obtained
+        (rounded off to two decimal places for brevity).
+        \begin{equation*}
+            ^{C} \mathbf{\tilde{T}}_{L} = \begin{bmatrix}
+                -0.18 & -0.98 & 0.0 & 0.15 \\
+                0.02 & 0.0 & -0.99 & -0.41 \\
+                0.98 & -0.18 & 0.02 & -0.6
+            \end{bmatrix}
+        \end{equation*}
+        It can be noted that the determinant of the rotation matrix (first three columns)
+        has a determinant +1, as can be seen in the code in the notebook.
+
+        \item We use the estimated transformation matrix $^{C} \mathbf{\tilde{T}}_{L}$ to
+        map the LIDAR points to the camera coordinate frame, and then project them to
+        the image plane using the camera's (given) intrinsic parameters and the (given)
+        extrinsic parameters for each image. The figures are given in
+        \figref{lidar-projection}.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-5/projection.png}
+                \caption{LIDAR points projected to the image plane}
+                \label{fig:lidar-projection}
+            \end{center}
+        \end{figure} \\
+        It can be easily seen that not all points are within the checkerboard pattern's
+        boundary. For example, in images 1 and 9, some of the projected points are to the
+        right of the checkerboard. However, the points are close by. This could be due to
+        the error in estimating the transformation matrix.
+
+        \item We plot the normal vectors $\mathbf{\hat{n}}_{i}^{L}$, $\mathbf{\hat{n}}_{i}^{C}$,
+        and $^{C} \mathbf{R}_{L} \mathbf{\hat{n}}_{i}^{L}$ for 5 selected images. The
+        figure is given in \figref{normals-lidar}. In the figure, the blue normals are
+        the LIDAR normals $\mathbf{\hat{n}}_{i}^{L}$, the green normals are the camera
+        normals $\mathbf{\hat{n}}_{i}^{C}$, and the orange normals are the transformed
+        LIDAR normals $^{C} \mathbf{R}_{L} \mathbf{\hat{n}}_{i}^{L}$.
+        \begin{figure}[htbp]
+            \begin{center}
+                \includegraphics[width=0.875\textwidth]{Assets/Question-5/normals.png}
+                \caption{Normal vectors for 5 selected images}
+                \label{fig:normals-lidar}
+            \end{center}
+        \end{figure}
+        It can be seen that the transformed LIDAR normals are close to the camera normals,
+        whereas the plain LIDAR normals are not. This is expected, as the transformation
+        matrix maps LIDAR points (and therefore vectors) to the camera coordinate frame.
+        The normals were plotted on the chessboard pattern by finding the centroid of the
+        LIDAR points, and then plotting an arrow from the centroid to a few units in the
+        direction of the normal.
+    \end{enumerate}
+
+    \section*{\textbf{References}}
     \begin{enumerate}
         \item \href{https://learnopencv.com/camera-calibration-using-opencv/}{
             Camera Calibration using OpenCV
+        }
+        \item \href{https://www.ri.cmu.edu/pub_files/pub4/unnikrishnan_ranjith_2005_3/unnikrishnan_ranjith_2005_3.pdf}{
+            Ranjith Unnikrishnan, Fast Extrinsic Calibration of a Laser Rangefinder to a Camera, 2005
         }
     \end{enumerate}
 
